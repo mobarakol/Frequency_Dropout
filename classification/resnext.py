@@ -88,7 +88,6 @@ class ResNext(nn.Module):
         self.filter_all = [get_gaussian_filter, get_laplacian_gaussian_filter, get_gabor_filter]
         self.freq_max_all = args.freq_max_all
         self.freq_min_all = args.freq_min_all
-        #self.dropout_p_all = [0.4, 0.6, 0.8]
         print('dropout_p_all:',args.dropout_p_all, '\n freq_min_all',args.freq_min_all, '\n freq_max_all',
                 args.freq_max_all)
         self.dropout_p_all = args.dropout_p_all

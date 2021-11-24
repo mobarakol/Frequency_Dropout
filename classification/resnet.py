@@ -41,13 +41,9 @@ class BasicBlock(nn.Module):
     
     def get_new_kernels(self, ksize, freq_min, freq_max, dropout_p, filter_func=None):
         sigma = torch.tensor(np.random.uniform(freq_min, freq_max, self.planes))
-        #sigma = torch.distributions.uniform.Uniform(freq_min, freq_max).sample([self.planes])
         dropout = nn.Dropout(dropout_p)
         sigma = dropout(sigma)*(1-dropout_p)
         self.kernel1 = filter_func(ksize=ksize, sigma=sigma,  channels=self.planes)
-        #sigma = np.random.uniform(freq_min, freq_max, self.planes)
-        #dropout = nn.Dropout(dropout_p)
-        #sigma = dropout(sigma)*(1-dropout_p)
         self.kernel2 = filter_func(ksize=ksize, sigma=sigma,  channels=self.planes)
 
     def get_new_kernels_cbs(self, kernel_size, std):
@@ -79,7 +75,7 @@ class ResNet(nn.Module):
         self.freq_max_all = args.freq_max_all
         self.freq_min_all = args.freq_min_all
         print('dropout_p_all:',args.dropout_p_all, '\n freq_min_all',args.freq_min_all, '\n freq_max_all',
-                args.freq_max_all, '\n num of filters:', self.num_filters)
+                args.freq_max_all, '\n num of filters:', self.num_filters + 1)
         self.dropout_p_all = args.dropout_p_all
         self.std = args.std
         if args.dataset == 'imagenet':
@@ -125,7 +121,6 @@ class ResNet(nn.Module):
         out = self.layer2(out)
         out = self.layer3(out)
         out = self.layer4(out)
-        #out = F.avg_pool2d(out, 4)
         out = self.avgpool(out)
         out = torch.flatten(out, 1)
         out = self.linear(out)
@@ -137,7 +132,6 @@ class ResNet(nn.Module):
         filter_func, dropout_p = self.filter_all[f_idx], self.dropout_p_all[f_idx]
         freq_min, freq_max = self.freq_min_all[f_idx], self.freq_max_all[f_idx]
         sigma = torch.tensor(np.random.uniform(freq_min,freq_max, self.in_ch))
-        #sigma = torch.distributions.uniform.Uniform(freq_min, freq_max).sample([self.in_ch])
         dropout = nn.Dropout(dropout_p)
         sigma = dropout(sigma)*(1-dropout_p)
         self.kernel1 = filter_func(ksize=self.kernel_size, sigma=sigma, channels=self.in_ch)
@@ -156,7 +150,7 @@ class ResNet(nn.Module):
     def get_new_kernels_cbs(self, epoch_count):
         if epoch_count % 5 == 0 and epoch_count is not 0:
             self.std *= 0.9
-        #stds = torch.tensor().repeat(channels)
+            
         self.kernel1 = get_gaussian_filter(ksize=self.kernel_size, sigma=self.std, channels=self.in_ch)
 
         for child in self.layer1.children():

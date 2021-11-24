@@ -169,7 +169,7 @@ def get_data(args):
                 train_data, 
                 batch_size=args.batch_size,
                 pin_memory=True,
-                num_workers=int(4),
+                num_workers=int(0),
                 shuffle=True,
                 drop_last=True,
         )
@@ -179,7 +179,7 @@ def get_data(args):
             test_data, 
             batch_size=args.batch_size,
             pin_memory=True,
-            num_workers=int(4),
+            num_workers=int(0),
             shuffle=True,
             drop_last=False,
     )
