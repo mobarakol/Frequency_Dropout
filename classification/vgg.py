@@ -16,11 +16,12 @@ class VGG16_conv(torch.nn.Module):
         self.ch_list = [64,128, 256, 512]
         self.kernel_size = args.kernel_size
         self.filter_all = [get_gaussian_filter, get_laplacian_gaussian_filter, get_gabor_filter]
+        self.num_filters = 0 if args.use_gf else len(self.filter_all) - 1
         self.freq_max_all = args.freq_max_all
         self.freq_min_all = args.freq_min_all
-        #self.dropout_p_all = [0.4, 0.6, 0.8]
         print('dropout_p_all:',args.dropout_p_all, '\n freq_min_all',args.freq_min_all, '\n freq_max_all',
-                args.freq_max_all)
+                args.freq_max_all, '\n num of filters:', self.num_filters + 1)
+
         self.dropout_p_all = args.dropout_p_all
 
         self.conv1 = torch.nn.Sequential(
@@ -105,7 +106,7 @@ class VGG16_conv(torch.nn.Module):
                 nn.init.constant_(m.bias, 0)
 
     def get_new_kernels(self):
-        f_idx = random.randint(0,2)
+        f_idx = random.randint(0, self.num_filters)
         filter_func, dropout_p = self.filter_all[f_idx], self.dropout_p_all[f_idx]
         freq_min, freq_max = self.freq_min_all[f_idx], self.freq_max_all[f_idx]
         sigma = torch.tensor(np.random.uniform(freq_min,freq_max, self.ch_list[0]))

@@ -43,9 +43,6 @@ class wide_basic(nn.Module):
         dropout = nn.Dropout(dropout_p)
         sigma = dropout(sigma)*(1-dropout_p)
         self.kernel1 = filter_func(ksize=ksize, sigma=sigma,  channels=self.planes)
-        # sigma = torch.tensor(np.random.uniform(freq_min, freq_max, self.planes))
-        # dropout = nn.Dropout(dropout_p)
-        # sigma = dropout(sigma)*(1-dropout_p)
         self.kernel2 = filter_func(ksize=ksize, sigma=sigma,  channels=self.planes)
     
     def get_new_kernels_cbs(self, kernel_size, std):
@@ -73,11 +70,11 @@ class Wide_ResNet(nn.Module):
         self.in_ch = nStages[0]
         self.kernel_size = args.kernel_size
         self.filter_all = [get_gaussian_filter, get_laplacian_gaussian_filter, get_gabor_filter]
+        self.num_filters = 0 if args.use_gf else len(self.filter_all) - 1
         self.freq_max_all = args.freq_max_all
         self.freq_min_all = args.freq_min_all
-        #self.dropout_p_all = [0.4, 0.6, 0.8]
         print('dropout_p_all:',args.dropout_p_all, '\n freq_min_all',args.freq_min_all, '\n freq_max_all',
-                args.freq_max_all)
+                args.freq_max_all, '\n num of filters:', self.num_filters + 1)
         self.dropout_p_all = args.dropout_p_all
         self.std = args.std
         self.conv1 = conv3x3(args.in_dim, nStages[0])
@@ -98,11 +95,11 @@ class Wide_ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def get_new_kernels(self):
-        filter_idx = random.randint(0,len(self.dropout_p_all)-1)
-        freq_max = self.freq_max_all[filter_idx]
-        freq_min = self.freq_min_all[filter_idx]
-        dropout_p = self.dropout_p_all[filter_idx]
-        filter_func = self.filter_all[filter_idx]
+        f_idx = random.randint(0, self.num_filters)
+        freq_max = self.freq_max_all[f_idx]
+        freq_min = self.freq_min_all[f_idx]
+        dropout_p = self.dropout_p_all[f_idx]
+        filter_func = self.filter_all[f_idx]
         sigma = torch.tensor(np.random.uniform(freq_min,freq_max, self.in_ch))
         dropout = nn.Dropout(dropout_p)
         sigma = dropout(sigma)*(1-dropout_p)
@@ -119,7 +116,7 @@ class Wide_ResNet(nn.Module):
     def get_new_kernels_cbs(self, epoch_count):
         if epoch_count % 5 == 0 and epoch_count is not 0:
             self.std *= 0.9
-        #stds = torch.tensor().repeat(channels)
+            
         self.kernel1 = get_gaussian_filter(ksize=self.kernel_size, sigma=self.std, channels=self.in_ch)
 
         for child in self.layer1.children():

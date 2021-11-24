@@ -86,10 +86,11 @@ class ResNext(nn.Module):
         self.in_ch = self.in_channels
         self.kernel_size = args.kernel_size
         self.filter_all = [get_gaussian_filter, get_laplacian_gaussian_filter, get_gabor_filter]
+        self.num_filters = 0 if args.use_gf else len(self.filter_all) - 1
         self.freq_max_all = args.freq_max_all
         self.freq_min_all = args.freq_min_all
         print('dropout_p_all:',args.dropout_p_all, '\n freq_min_all',args.freq_min_all, '\n freq_max_all',
-                args.freq_max_all)
+                args.freq_max_all, '\n num of filters:', self.num_filters + 1)
         self.dropout_p_all = args.dropout_p_all
 
         self.conv1 = nn.Conv2d(args.in_dim, 64, kernel_size=3, stride=1, padding=1, bias=False)
@@ -133,7 +134,7 @@ class ResNext(nn.Module):
         return nn.Sequential(*layers)
 
     def get_new_kernels(self):
-        f_idx = random.randint(0,2)
+        f_idx = random.randint(0, self.num_filters)
         filter_func, dropout_p = self.filter_all[f_idx], self.dropout_p_all[f_idx]
         freq_min, freq_max = self.freq_min_all[f_idx], self.freq_max_all[f_idx]
         sigma = torch.tensor(np.random.uniform(freq_min,freq_max, self.in_ch))
