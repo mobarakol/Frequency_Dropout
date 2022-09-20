@@ -37,3 +37,14 @@ To train CBS model
 ```
 python main.py --batch_size 4  --epochs 400 --train_vendor A --freq_max_all 16 16 3 --dropout_p_all 1 1 1 --use_cbs
 ```
+
+The paper can be cited by using below bibtex.
+
+```bibtex
+@inproceedings{islam2022frequency,
+  title={Frequency Dropout: Feature-Level Regularization via Randomized Filtering},
+  author={Islam, Mobarakol and Glocker, Ben},
+  booktitle={ECCV 2022 MEDICAL COMPUTER VISION WORKSHOP},
+  year={2022},
+}
+```
