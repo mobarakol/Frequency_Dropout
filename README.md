@@ -1,6 +1,6 @@
 # Frequency_Dropout
 
-This repository contains the code implementation of the [ECCV 2022 MEDICAL COMPUTER VISION WORKSHOP](https://mcv-workshop.github.io/) paper "Frequency Dropout: Feature-Level Regularization via Randomized Filtering" [Preprint](https://arxiv.org/pdf/2209.09844.pdf)
+This repository contains the code implementation of the [ECCV 2022 MEDICAL COMPUTER VISION WORKSHOP](https://mcv-workshop.github.io/) paper "Frequency Dropout: Feature-Level Regularization via Randomized Filtering" [[Preprint]](https://arxiv.org/pdf/2209.09844.pdf)
 ## Classification tasks
 The code is adopted from a close baseline model CBS (https://github.com/pairlab/CBS) <br>
 To train Frequency Dropout for Randomized Filtering (FD-RF) model
